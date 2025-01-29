@@ -1,49 +1,12 @@
 from datetime import datetime
 
-import argparse
-import binascii
 import hashlib
 import os
 import rsa
 
+from crypto_utils import *
+
 # -------------------------------- Helper functions --------------------------------
-# Given a filename, return the hash of its contents
-def hashFile(filename):
-    with open(filename, "r") as file:
-        lines = file.readlines()
-        content = ''.join(lines)
-        return hashlib.sha256(content.encode('ascii')).hexdigest()
-
-# Given an array of bytes, return a hex reprenstation of it
-def bytesToString(data):
-    return binascii.hexlify(data)
-
-# Given a hex reprensetation, convert it to an array of bytes
-def stringToBytes(hexstr):
-    return binascii.a2b_hex(hexstr)
-
-# Load the wallet keys from a filename
-def loadWallet(filename):
-    with open(filename, mode='rb') as file:
-        keydata = file.read()
-    privkey = rsa.PrivateKey.load_pkcs1(keydata)
-    pubkey = rsa.PublicKey.load_pkcs1(keydata)
-    return pubkey, privkey
-
-# Save the wallet to a file
-def saveWallet(pubkey, privkey, filename):
-    # Save the keys to a key format (outputs bytes)
-    pubkeyBytes = pubkey.save_pkcs1(format='PEM')
-    privkeyBytes = privkey.save_pkcs1(format='PEM')
-    # Convert those bytes to strings to write to a file (gibberish, but a string...)
-    pubkeyString = pubkeyBytes.decode('ascii')
-    privkeyString = privkeyBytes.decode('ascii')
-    # Write both keys to the wallet file
-    with open(filename, 'w') as file:
-        file.write(pubkeyString)
-        file.write(privkeyString)
-    return
-
 # Get the first 16 characters of a wallet tag and the private key
 def get_wallet_tags(wallet_file_name):
     public_key, private_key = loadWallet(wallet_file_name)
@@ -239,43 +202,3 @@ def validate():
             hashes.append(compute_block_hash(f"block_{i}.txt"))
             
     return True
-
-# Main function to parse and execute commands
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("command", help="The command to execute")
-    parser.add_argument("args", nargs=argparse.REMAINDER, help="Additional arguments for the command")
-    args = parser.parse_args()
-
-    match args.command:
-        case command if command in ("name", "genesis", "validate"):
-            print(globals()[args.command]())
-    
-        case command if command in ("generate", "address", "balance"):
-            wallet = args.args[0]
-            print(globals()[args.command](wallet))
-            
-        case "fund":
-            wallet = args.args[0]
-            amount = args.args[1]
-            transaction_statement = args.args[2]
-            print(fund(wallet, amount, transaction_statement))
-
-        case "transfer":
-            source_wallet = args.args[0]
-            destination_wallet = args.args[1]
-            amount = args.args[2]
-            transaction_statement = args.args[3]
-            print(transfer(source_wallet, destination_wallet, amount, transaction_statement))
-            
-        case "verify":
-            wallet = args.args[0]
-            transaction_statement = args.args[1]
-            print(verify(wallet, transaction_statement))
-            
-        case "mine":
-            difficulty = int(args.args[0])
-            print(mine(difficulty))
-
-if __name__ == "__main__":
-    main()

@@ -1,2 +1,2 @@
 #! /bin/bash
-python3 cryptomoney.py $@
+python3 crypto_cli.py $@
