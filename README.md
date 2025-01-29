@@ -70,5 +70,3 @@ To run the tests, navigate to the respective testing directory and execute the s
 
 ## Contributing
 Contributions are welcome! Please feel free to open issues or submit pull requests.  Ensure you follow the established coding style and add appropriate tests for any new features or bug fixes.
-
-*README.md was made with [Etchr](https://etchr.dev)*
