@@ -69,7 +69,7 @@ def generate(wallet_file_name):
     
 # Returns the address (first 16 characters of the public key) of the wallet
 def address(wallet_file_name):
-    public_key, _ = get_wallet_tags(f"cryptocurrency/wallet/{wallet_file_name}")
+    public_key, _ = get_wallet_tags(wallet_file_name)
     return public_key
 
 # Funds a wallet with a specified amount and creates a transaction statement
@@ -87,7 +87,7 @@ def fund(wallet_tag, amount, transaction_statement):
 # Transfers a specified amount from one wallet to another and creates a transaction statement
 def transfer(source_wallet_file_name, destination_wallet_tag, amount, transaction_statement):
     time = str(datetime.now())
-    source_wallet_tag, source_private_key = get_wallet_tags(f"cryptocurrency/wallet/{source_wallet_file_name}")
+    source_wallet_tag, source_private_key = get_wallet_tags(source_wallet_file_name)
     message = f"From: {source_wallet_tag}\nTo: {destination_wallet_tag}\nAmount: {amount}\nDate: {time}"
     signature = encrypt_message(message, source_private_key)
     
@@ -134,7 +134,7 @@ def verify(wallet_file_name, transaction_statement):
         amount = int(lines[2].split("Amount: ")[1].strip())
         time = lines[3].split("Date: ")[1].strip()
         
-        wallet_tag, _ = get_wallet_tags(f"cryptocurrency/wallet/{wallet_file_name}")
+        wallet_tag, _ = get_wallet_tags(wallet_file_name)
         local_balance = balance(wallet_tag)
 
         if source != special_case_id and destination != wallet_tag and local_balance < amount:
